@@ -195,38 +195,15 @@ ax2.tick_params(axis='y', labelcolor=color)
 fig.tight_layout()  # otherwise the right y-label is slightly clipped
 st.pyplot(fig)
 
-st.write("Данный график из-за большого периода недостаточно наглядно показывает некоторые моменты\
+st.write("Данный график из-за большого периода недостаточно наглядно показывает некоторые моменты.\
          В частности, в период по 2014 год включительно, связь между курсом доллара к рублю и ценой нефти\
          была очень сильной. Начиная с 2015, а еще более выраженно с 2018, эта связь была разорвана\
          и рубль стал стоить существенно меньше, чем можно было ожидать при той же цене на нефть\
-         это связано с особенностями валютных операций и т.н. бюджетного правила.")
+         это связано с особенностями валютных операций и т.н. бюджетного правила.\
+         Это на практике означало также резкое снижение покупательной способности работников в отношении\
+         импортных товаров и услуг и сохранение валютных средств в контуре страны")
 st.write("Автор был непосредственным наблюдателем, а где-то и участником всех описанных на графиках процессов\
          с 2001 по 2021 годы :-)")
-
-st.write("Для наглядности рассмотрим отдельно период 2000-2014 г.")
-
-fig, ax1 = plt.subplots()
-
-color = 'tab:red'
-ax1.set_xlabel('year')
-ax1.set_ylabel('USD RUB rate', color=color)
-ax1.set_ylim(20,40)
-ax1.plot(all_data.index[:15], all_data.USDRUB_year_avg[2000:2014], color=color)
-ax1.tick_params(axis='y', labelcolor=color)
-
-ax2 = ax1.twinx()  # instantiate a second axes that shares the same x-axis
-
-color = 'tab:blue'
-ax2.set_ylabel('Brent price', color=color)  # we already handled the x-label with ax1
-ax2.set_ylim(20,150)
-    ax2.plot(all_data.index[:15], all_data.BRENT_year_avg[2000:2014], color=color)
-
-ax2.tick_params(axis='y', labelcolor=color)
-
-fig.tight_layout()  # otherwise the right y-label is slightly clipped
-st.pyplot(fig)
-
-
 
 #salaries_inflation.horeca.iloc[-1]/ salaries_inflation.horeca.iloc[0]
 #salaries_inflation.oilgasandcoal.iloc[-1]/ salaries_inflation.oilgasandcoal.iloc[0]
