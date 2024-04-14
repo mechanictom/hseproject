@@ -6,19 +6,9 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
 
-# # Загрузка и подготовка данных
+# Загрузка и подготовка данных
 
-# Загружаем данные Росстата по предоставленным в задании ссылкам.
-# 
-# * [Зарплаты](https://rosstat.gov.ru/labor_market_employment_salaries)
-# * [Инфляция](https://уровень-инфляции.рф/%D1%82%D0%B0%D0%B1%D0%BB%D0%B8%D1%86%D1%8B-%D0%B8%D0%BD%D1%84%D0%BB%D1%8F%D1%86%D0%B8%D0%B8)
-# 
-# Также дополнительно подгрузим цену барреля нефти сорта Brent и курс доллара:
-# * [USD/RUB](https://investfunds.ru/indexes/39/)
-# * [BRENT](https://investfunds.ru/indexes/624/)
-# 
 # Приведем данные в единый удобный для работы формат
-# 
 
 salaries0 = st.cache_data(pd.read_excel)(
     'zpl by field.xlsx',
@@ -37,7 +27,6 @@ inflation = st.cache_data(pd.read_excel)('inflation.xlsx')
 brent = st.cache_data(pd.read_excel)('brent.xlsx')
 usdrub = st.cache_data(pd.read_excel)('usdrub.xlsx')
 
-
 inflation = inflation[['Год', 'Всего']]
 inflation = inflation.set_index('Год')
 
@@ -53,7 +42,7 @@ salaries1.rename(columns={
 #удаляем строчки с примечаниями
 salaries0 = salaries0[:-3]
 
-# ### Отфильтруем нужные строки и объединим фреймы
+# Отфильтруем нужные строки и объединим фреймы
 # В датафреймах существенно различается разбивка по строкам, поэтому имеет смысл сначала выделить нужные, удалить, дать одинаковые имена и затем конкатенировать.
 
 old = salaries1.loc[["  добыча топливно-энергетических  полезных ископаемых", "Гостиницы и рестораны", "Образование"]].T
@@ -91,10 +80,6 @@ salaries_inflation = salaries_inflation[salaries_inflation.index > 1999]
 
 salaries_inflation['deflator'] = salaries_inflation.inflation.shift(fill_value=1).cumprod()
 
-salaries_inflation.horeca.iloc[-1]/ salaries_inflation.horeca.iloc[0]
-
-salaries_inflation.oilgasandcoal.iloc[-1]/ salaries_inflation.oilgasandcoal.iloc[0]
-
 usdrub['Дата'] = pd.to_datetime(usdrub['Дата'])
 brent['Дата'] = pd.to_datetime(brent['Дата'])
 
@@ -107,45 +92,58 @@ brent_year = brent.groupby(brent['Дата'].dt.year)['BRENT_year_avg'].mean()
 
 all_data = pd.concat([salaries_inflation, brent_year, usdrub_year], axis=1)
 
-# ### Визуализируем собранные данные
-
-st.pyplot(all_data[['oilgasandcoal','horeca','education']].plot().figure)
-
-# Из графиков видно, что во всех выбранных отраслях средний размер оплаты растет на протяжении всего периода наблюдений. Однако данные графики недостаточно информативны, т.к. показывают зарплаты в номинальном выражении. Попробуем привести все зарплаты к ценам 2000 года, поделив на соответствующий дефлятор.
-
 for col in ['oilgasandcoal','horeca','education']:
     all_data[col+"_corr"] = all_data[col] / all_data['deflator']
 
-# Выведем на график зарплаты, скорректированные на инфляцию, т.наз. реальные зарплаты.
-# Из графика виден рост реальных доходов, характерный для всех рассматриваемых отраслей. Обращает на себя внимание, что реальные доходы в образовании после 2008 года стали обгонять доходы в индустрии гостеприимства и общепита.
+# ### Визуализируем собранные данные
 
-all_data[['oilgasandcoal_corr','horeca_corr','education_corr']].plot();
+st.title('Краткий обзор доходов работников по избранным отраслям экономики')
+
+st.write('Пользуясь данными Росстата и некоторыми сторонними источниками, попробуем\
+    проанализировать изменение доходов работников ряда отраслей в период с 2000 по 2023 гг.')
+
+
+infl_corrected = st.radio('Выбор типа графика', ['Номинальные показатели', 'Скорректированные на инфляцию'])
+
+if infl_corrected == 'Номинальные показатели':
+    st.pyplot(all_data[['oilgasandcoal','horeca','education']].plot().figure)
+    st.write("Из графиков видно, что во всех выбранных отраслях средний размер оплаты\
+        растет на протяжении всего периода наблюдений. Однако данные графики недостаточно\
+         информативны, т.к. показывают зарплаты в номинальном выражении. Попробуем привести\
+          все зарплаты к ценам 2000 года, поделив на соответствующий дефлятор.")
+
+elif infl_corrected == 'Скорректированные на инфляцию':
+    st.pyplot(all_data[['oilgasandcoal_corr','horeca_corr','education_corr']].plot().figure)
+    st.write('На график выведены зарплаты, скорректированные на величину инфляции, т.наз.\
+            реальные зарплаты, в ценах 2000 г.\
+            Из графика виден рост реальных доходов, характерный для всех рассматриваемых отраслей.\
+            Обращает на себя внимание, что реальные доходы в образовании после 2008 года стали\
+            обгонять доходы в индустрии гостеприимства и общепита.')
 
 all_data['nrg_edu_ratio'] = all_data['oilgasandcoal'] / all_data['education']
 all_data['horeca_edu_ratio'] = all_data['horeca'] / all_data['education']
 all_data['nrg_horeca_ratio'] = all_data['oilgasandcoal'] / all_data['horeca']
 
-all_data[['nrg_edu_ratio', 'horeca_edu_ratio', 'nrg_horeca_ratio']].plot();
-
-
-# Рассмотрим эти соотношения немного подробнее. В начале века заработная плата в области добычи энергетических полезных ископаемых превосходила зарплаты в образовании в 6 раз. К 2023 году соотношение снизилось до 3 и менее. Соотношение зарплат в хореке и образовании близко к единице, но в начале века оно превышало 1.0, сейчас - ниже 1.0. 
-
-# In[379]:
-
+if st.button('Показать соотношения зарплат'):
+    st.pyplot(all_data[['nrg_edu_ratio', 'horeca_edu_ratio', 'nrg_horeca_ratio']].plot().figure)
+    st.write("Рассмотрим соотношения между отраслями немного подробнее. Например, в начале века заработная плата\
+        работников, занятых в добыче энергетических полезных ископаемых превосходила зарплаты в образовании в 6 раз.\
+        К 2023 году соотношение снизилось до 3 и менее. Соотношение зарплат в хореке и образовании\
+        близко к единице, но в начале века оно превышало 1.0, а сейчас - ниже 1.0.")
 
 all_data['oilgasandcoal_usd'] = all_data['oilgasandcoal'] / all_data['USDRUB_year_avg']
 all_data['horeca_usd'] = all_data['horeca'] / all_data['USDRUB_year_avg']
 all_data['education_usd'] = all_data['education'] / all_data['USDRUB_year_avg']
 
+st.write('### Изучим связь нефтегазовых доходов страны и реальных доходов населения')
 
-# In[410]:
-
+choice = st.radio("Выберите отрасль", ['oilgasandcoal', 'horeca', 'education'])
 
 fig, ax1 = plt.subplots()
 
 color = 'tab:red'
-ax1.set_xlabel('year')
-ax1.set_ylabel('BRENT price', color=color)
+ax1.set_xlabel('Год')
+ax1.set_ylabel('Цена барреля BRENT', color=color)
 ax1.set_ylim(0,200)
 ax1.bar(all_data.index, all_data.BRENT_year_avg, color=color)
 ax1.tick_params(axis='y', labelcolor=color)
@@ -153,26 +151,27 @@ ax1.tick_params(axis='y', labelcolor=color)
 ax2 = ax1.twinx()  # instantiate a second axes that shares the same x-axis
 
 color = 'tab:blue'
-ax2.set_ylabel('energy resources extraction - salaries', color=color)  # we already handled the x-label with ax1
-ax2.plot(all_data.index, all_data.oilgasandcoal_corr, color=color)
+ax2.set_ylabel('Реальные зарплаты в секторе '+choice+', в руб. 2000 г.', color=color)  # we already handled the x-label with ax1
+ax2.plot(all_data.index, all_data[choice+'_corr'], color=color)
 ax2.tick_params(axis='y', labelcolor=color)
 
 fig.tight_layout()  # otherwise the right y-label is slightly clipped
 st.pyplot(fig)
 
+st.write("Период с 2003 по 2014 год отметился самым быстрым ростом зарплат и наиболее высокими ценами на нефть.")
 
-# Интересно посмотреть на то, как рост зарплат в энергетическом секторе коррелирует с ценой на нефть. Период с 2003 по 2014 год отметился самым быстрым ростом зарплат и наиболее высокими ценами на нефть. 
+st.write('## Оценим реальные доходы работников в USD')
 
-# In[435]:
+st.pyplot(all_data[['oilgasandcoal_usd', 'horeca_usd', 'education_usd']].plot().figure)
 
-
-all_data[['oilgasandcoal_usd', 'horeca_usd', 'education_usd']].plot();
-
-
-# Наконец, интересно исследовать зарплаты, выраженные в более стабильной валюте, в данном случае основной мировой резервной валюте - доллларе США. Из графика очевидно, что рост реальных доходов, выраженный в валюте, прекратился после 2014 года. Такое сравнение доходов актуально в отношении покупки импортных товаров, зарубежных туристических поездок. Период с 2000 по 2014 год характеризовался крайне быстрым ростом доходов в долларовом выражении, при этом даже глубокий финансовый кризис 2008 года на этом процессе отразился не так сильно. 
+st.write("Интересно исследовать зарплаты, выраженные в более стабильной валюте,\
+    в данном случае основной мировой резервной валюте - доллларе США. Из графика очевидно,\
+    что рост реальных доходов, выраженный в валюте, прекратился после 2014 года.\
+    Выражение доходов в иностранной валюте актуально в отношении покупки импортных товаров, зарубежных туристических поездок.\
+    Период с 2000 по 2014 год характеризовался крайне быстрым ростом доходов в долларовом выражении,\
+    при этом даже глубокий финансовый кризис 2008 года на этом процессе отразился не так сильно.")
 
 # In[477]:
-
 
 fig, ax1 = plt.subplots()
 
@@ -191,11 +190,8 @@ ax2.plot(all_data.index, all_data.BRENT_year_avg, color=color)
 ax2.tick_params(axis='y', labelcolor=color)
 
 fig.tight_layout()  # otherwise the right y-label is slightly clipped
-plt.show()
+st.pyplot(fig)
 
 
-# In[ ]:
-
-
-
-
+#salaries_inflation.horeca.iloc[-1]/ salaries_inflation.horeca.iloc[0]
+#salaries_inflation.oilgasandcoal.iloc[-1]/ salaries_inflation.oilgasandcoal.iloc[0]
