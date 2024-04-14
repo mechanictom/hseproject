@@ -1,4 +1,4 @@
-﻿# hseproject
+# hseproject
 Финальный проект для курса "Старт в DS" от ВШЭ
 
 ## Источники данных
@@ -9,13 +9,20 @@
 * [BRENT](https://investfunds.ru/indexes/624/)
 
 ## Файлы
-project.ipynb - исследование в Jupyter Notebook
-README.md - данный файл
-project.py - скрипт для запуска приложения Streamlit
-brent.xlsx - данные с ценой барреля брент
-inflation.xlsx - данные по инфляции
-usdrub.xlsx - данные по курсу доллара
-zpl by field.xlsx - зарплаты по отраслям экономики
+
+	project.ipynb - исследование в Jupyter Notebook
+
+	README.md - данный файл
+
+	project.py - скрипт для запуска приложения Streamlit
+
+	brent.xlsx - данные с ценой барреля брент
+
+	inflation.xlsx - данные по инфляции
+
+	usdrub.xlsx - данные по курсу доллара
+
+	zpl by field.xlsx - зарплаты по отраслям экономики
 
 ## Автор
 @mechanictom
