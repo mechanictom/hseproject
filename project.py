@@ -204,7 +204,29 @@ st.write("Автор был непосредственным наблюдате�
          с 2001 по 2021 годы :-)")
 
 st.write("Для наглядности рассмотрим отдельно период 2000-2014 г.")
-st.pyplot(all_data[2000:2014, ['USDRUB_year_avg', 'BRENT_year_avg']].plot().figure)
+
+
+fig, ax1 = plt.subplots()
+
+color = 'tab:red'
+ax1.set_xlabel('year')
+ax1.set_ylabel('USD RUB rate', color=color)
+ax1.set_ylim(20,40)
+ax1.plot(all_data.index, all_data[2000:2014].USDRUB_year_avg, color=color)
+ax1.tick_params(axis='y', labelcolor=color)
+
+ax2 = ax1.twinx()  # instantiate a second axes that shares the same x-axis
+
+color = 'tab:blue'
+ax2.set_ylabel('Brent price', color=color)  # we already handled the x-label with ax1
+ax2.set_ylim(20,150)
+ax2.plot(all_data.index, all_data[2000:2014].BRENT_year_avg, color=color)
+
+ax2.tick_params(axis='y', labelcolor=color)
+
+fig.tight_layout()  # otherwise the right y-label is slightly clipped
+st.pyplot(fig)
+
 
 #salaries_inflation.horeca.iloc[-1]/ salaries_inflation.horeca.iloc[0]
 #salaries_inflation.oilgasandcoal.iloc[-1]/ salaries_inflation.oilgasandcoal.iloc[0]
