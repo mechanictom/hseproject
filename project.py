@@ -205,7 +205,6 @@ st.write("Автор был непосредственным наблюдате�
 
 st.write("Для наглядности рассмотрим отдельно период 2000-2014 г.")
 
-
 fig, ax1 = plt.subplots()
 
 color = 'tab:red'
@@ -226,6 +225,7 @@ ax2.tick_params(axis='y', labelcolor=color)
 
 fig.tight_layout()  # otherwise the right y-label is slightly clipped
 st.pyplot(fig)
+
 
 
 #salaries_inflation.horeca.iloc[-1]/ salaries_inflation.horeca.iloc[0]
