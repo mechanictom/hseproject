@@ -1,24 +1,24 @@
-# hseproject
-Финальный проект для курса "Старт в DS" от ВШЭ
+п»ї# hseproject
+Р¤РёРЅР°Р»СЊРЅС‹Р№ РїСЂРѕРµРєС‚ РґР»СЏ РєСѓСЂСЃР° "РЎС‚Р°СЂС‚ РІ DS" РѕС‚ Р’РЁР­
 
-## Источники данных
-* [Зарплаты](https://rosstat.gov.ru/labor_market_employment_salaries)
-* [Инфляция](https://уровень-инфляции.рф/%D1%82%D0%B0%D0%B1%D0%BB%D0%B8%D1%86%D1%8B-%D0%B8%D0%BD%D1%84%D0%BB%D1%8F%D1%86%D0%B8%D0%B8)
+## РСЃС‚РѕС‡РЅРёРєРё РґР°РЅРЅС‹С…
+* [Р—Р°СЂРїР»Р°С‚С‹](https://rosstat.gov.ru/labor_market_employment_salaries)
+* [РРЅС„Р»СЏС†РёСЏ](https://СѓСЂРѕРІРµРЅСЊ-РёРЅС„Р»СЏС†РёРё.СЂС„/%D1%82%D0%B0%D0%B1%D0%BB%D0%B8%D1%86%D1%8B-%D0%B8%D0%BD%D1%84%D0%BB%D1%8F%D1%86%D0%B8%D0%B8)
  
 * [USD/RUB](https://investfunds.ru/indexes/39/)
 * [BRENT](https://investfunds.ru/indexes/624/)
 
-## Файлы
-project.ipynb - исследование в Jupyter Notebook
-README.md - данный файл
-project.py - скрипт для запуска приложения Streamlit
-brent.xlsx - данные с ценой барреля брент
-inflation.xlsx - данные по инфляции
-usdrub.xlsx - данные по курсу доллара
-zpl by field.xlsx - зарплаты по отраслям экономики
+## Р¤Р°Р№Р»С‹
+project.ipynb - РёСЃСЃР»РµРґРѕРІР°РЅРёРµ РІ Jupyter Notebook
+README.md - РґР°РЅРЅС‹Р№ С„Р°Р№Р»
+project.py - СЃРєСЂРёРїС‚ РґР»СЏ Р·Р°РїСѓСЃРєР° РїСЂРёР»РѕР¶РµРЅРёСЏ Streamlit
+brent.xlsx - РґР°РЅРЅС‹Рµ СЃ С†РµРЅРѕР№ Р±Р°СЂСЂРµР»СЏ Р±СЂРµРЅС‚
+inflation.xlsx - РґР°РЅРЅС‹Рµ РїРѕ РёРЅС„Р»СЏС†РёРё
+usdrub.xlsx - РґР°РЅРЅС‹Рµ РїРѕ РєСѓСЂСЃСѓ РґРѕР»Р»Р°СЂР°
+zpl by field.xlsx - Р·Р°СЂРїР»Р°С‚С‹ РїРѕ РѕС‚СЂР°СЃР»СЏРј СЌРєРѕРЅРѕРјРёРєРё
 
-## Автор
+## РђРІС‚РѕСЂ
 @mechanictom
 
-## Лицензия
+## Р›РёС†РµРЅР·РёСЏ
 The Unlicense

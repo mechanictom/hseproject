@@ -1,13 +1,10 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[436]:
-
-
+import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
-
 
 # # Загрузка и подготовка данных
 
@@ -23,133 +20,53 @@ import numpy as np
 # Приведем данные в единый удобный для работы формат
 # 
 
-# In[437]:
-
-
-salaries0 = pd.read_excel(
+salaries0 = st.cache_data(pd.read_excel)(
     'zpl by field.xlsx',
     sheet_name='с 2017 г.',
     skiprows=4,
     index_col=0
     )
-salaries1 = pd.read_excel(
+salaries1 = st.cache_data(pd.read_excel)(
     'zpl by field.xlsx',
     sheet_name='2000-2016 гг.',
     skiprows=2,
     index_col=0
     )
 
-
-# In[438]:
-
-
-inflation = pd.read_excel('inflation.xlsx')
-brent = pd.read_excel('brent.xlsx')
-usdrub = pd.read_excel('usdrub.xlsx')
-
-
-# In[439]:
+inflation = st.cache_data(pd.read_excel)('inflation.xlsx')
+brent = st.cache_data(pd.read_excel)('brent.xlsx')
+usdrub = st.cache_data(pd.read_excel)('usdrub.xlsx')
 
 
 inflation = inflation[['Год', 'Всего']]
 inflation = inflation.set_index('Год')
-
-
-# In[440]:
-
-
-salaries1.head(5)
-
-
-# In[441]:
-
-
-salaries0.head(5)
-
-
-# In[442]:
-
-
-salaries0.columns
-
-
-# In[443]:
-
 
 salaries0.rename(columns={
         '20171)': 2017,
         '20222)': 2022,
         '20232), 3)': 2023}, inplace=True)
 
-
-# In[444]:
-
-
-salaries1.columns
-
-
-# In[445]:
-
-
 salaries1.rename(columns={
         'Unnamed: 0': 'Отрасль',
         }, inplace=True)
 
-
-# In[446]:
-
-
 #удаляем строчки с примечаниями
 salaries0 = salaries0[:-3]
-
 
 # ### Отфильтруем нужные строки и объединим фреймы
 # В датафреймах существенно различается разбивка по строкам, поэтому имеет смысл сначала выделить нужные, удалить, дать одинаковые имена и затем конкатенировать.
 
-# In[447]:
-
-
 old = salaries1.loc[["  добыча топливно-энергетических  полезных ископаемых", "Гостиницы и рестораны", "Образование"]].T
-
-
-# In[448]:
-
-
-#зададим общий строковый формат для годов
-salaries1.columns = [str(a) for a in salaries1.columns]
-
-
-# In[449]:
-
 
 new = salaries0.loc[["     добыча нефти и природного газа",
                      "     добыча угля", 
                      "деятельность гостиниц и предприятий общественного питания",
                      "образование"]].T
 
-
-# In[450]:
-
-
 old.columns = ['oilgasandcoal', 'horeca', 'education']
 new.columns = ['oilgas', 'coal', 'horeca', 'education']
 
-
-# In[451]:
-
-
-old.head(5)
-
-
-# In[452]:
-
-
 old = old.apply(pd.to_numeric)
-
-
-# In[453]:
-
-
 new = new.apply(pd.to_numeric)
 
 # за неимением данных численности работников в добыче угля и нефтегаза возьмем просто среднюю зп 
@@ -157,58 +74,14 @@ new = new.apply(pd.to_numeric)
 new['oilgasandcoal'] = (new.coal + new.oilgas)/2
 new.drop(columns=['oilgas', 'coal'], inplace=True)
 
-
-# In[454]:
-
-
 salaries = pd.concat([old, new])
-
-
-# In[455]:
-
-
-salaries.index
-
-
-# In[456]:
-
-
-inflation.index
-
-
-# In[457]:
-
 
 inflation.columns = ['inflation']
 
-
-# In[458]:
-
-
 salaries_inflation = pd.concat([salaries, inflation], axis=1)
-
-
-# In[459]:
-
-
 salaries_inflation.inflation = salaries_inflation.inflation.apply(lambda x: 1+x/100.)
 
-
-# In[460]:
-
-
-salaries_inflation.head(5)
-
-
-# In[461]:
-
-
-# уберем годы, не покрытые данными по зарплатам
 salaries_inflation = salaries_inflation[salaries_inflation.index > 1999]
-
-
-# In[462]:
-
 
 # создадим показатель "дефлятор", отражающий накопленную за годы инфляцию, начиная с 2000 года
 # для этого перемножим показатели каждого года со сдвигом на один год (в 2000 примем индекс за 1.0)
@@ -218,109 +91,39 @@ salaries_inflation = salaries_inflation[salaries_inflation.index > 1999]
 
 salaries_inflation['deflator'] = salaries_inflation.inflation.shift(fill_value=1).cumprod()
 
-
-# In[463]:
-
-
-salaries_inflation
-
-
-# In[465]:
-
-
 salaries_inflation.horeca.iloc[-1]/ salaries_inflation.horeca.iloc[0]
-
-
-# In[466]:
-
 
 salaries_inflation.oilgasandcoal.iloc[-1]/ salaries_inflation.oilgasandcoal.iloc[0]
 
-
-# ## Данные о курсе валют и цене нефти необходимо агрегировать
-
-# In[467]:
-
-
 usdrub['Дата'] = pd.to_datetime(usdrub['Дата'])
 brent['Дата'] = pd.to_datetime(brent['Дата'])
-
-
-# In[469]:
-
 
 #Получим среднегодовые значения 
 usdrub['USDRUB_year_avg'] = usdrub.groupby(usdrub['Дата'].dt.year)['Значение'].transform('mean')
 usdrub_year = usdrub.groupby(usdrub['Дата'].dt.year)['USDRUB_year_avg'].mean()
 
-
-# In[470]:
-
-
-usdrub_year.head(5)
-
-
-# In[471]:
-
-
 brent['BRENT_year_avg'] = brent.groupby(brent['Дата'].dt.year)['Значение'].transform('mean')
 brent_year = brent.groupby(brent['Дата'].dt.year)['BRENT_year_avg'].mean()
 
-
-# In[472]:
-
-
-brent_year.head(5)
-
-
-# In[473]:
-
-
 all_data = pd.concat([salaries_inflation, brent_year, usdrub_year], axis=1)
-
-
-# In[474]:
-
-
-all_data.head()
-
 
 # ### Визуализируем собранные данные
 
-# In[476]:
-
-
-all_data[['oilgasandcoal','horeca','education']].plot();
-
+st.pyplot(all_data[['oilgasandcoal','horeca','education']].plot().figure)
 
 # Из графиков видно, что во всех выбранных отраслях средний размер оплаты растет на протяжении всего периода наблюдений. Однако данные графики недостаточно информативны, т.к. показывают зарплаты в номинальном выражении. Попробуем привести все зарплаты к ценам 2000 года, поделив на соответствующий дефлятор.
-
-# In[368]:
-
 
 for col in ['oilgasandcoal','horeca','education']:
     all_data[col+"_corr"] = all_data[col] / all_data['deflator']
 
-
-# Выведем на график зарплаты, скорректированные на инфляцию, т.наз. реальные зарплаты. 
+# Выведем на график зарплаты, скорректированные на инфляцию, т.наз. реальные зарплаты.
 # Из графика виден рост реальных доходов, характерный для всех рассматриваемых отраслей. Обращает на себя внимание, что реальные доходы в образовании после 2008 года стали обгонять доходы в индустрии гостеприимства и общепита.
 
-# In[376]:
-
-
 all_data[['oilgasandcoal_corr','horeca_corr','education_corr']].plot();
-
-
-# In[372]:
-
 
 all_data['nrg_edu_ratio'] = all_data['oilgasandcoal'] / all_data['education']
 all_data['horeca_edu_ratio'] = all_data['horeca'] / all_data['education']
 all_data['nrg_horeca_ratio'] = all_data['oilgasandcoal'] / all_data['horeca']
-
-
-# In[375]:
-
 
 all_data[['nrg_edu_ratio', 'horeca_edu_ratio', 'nrg_horeca_ratio']].plot();
 
@@ -355,7 +158,7 @@ ax2.plot(all_data.index, all_data.oilgasandcoal_corr, color=color)
 ax2.tick_params(axis='y', labelcolor=color)
 
 fig.tight_layout()  # otherwise the right y-label is slightly clipped
-plt.show()
+st.pyplot(fig)
 
 
 # Интересно посмотреть на то, как рост зарплат в энергетическом секторе коррелирует с ценой на нефть. Период с 2003 по 2014 год отметился самым быстрым ростом зарплат и наиболее высокими ценами на нефть. 
