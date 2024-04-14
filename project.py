@@ -204,7 +204,7 @@ st.write("Автор был непосредственным наблюдате�
          с 2001 по 2021 годы :-)")
 
 st.write("Для наглядности рассмотрим отдельно период 2000-2014 г.")
-st.pyplot(all_data[2000:2014, ['USDRUB_year_avg', 'BRENT_year_avg']].plot().figure)
+st.pyplot(all_data.loc[2000:2014, ['USDRUB_year_avg', 'BRENT_year_avg']].plot().figure)
 
 #salaries_inflation.horeca.iloc[-1]/ salaries_inflation.horeca.iloc[0]
 #salaries_inflation.oilgasandcoal.iloc[-1]/ salaries_inflation.oilgasandcoal.iloc[0]
